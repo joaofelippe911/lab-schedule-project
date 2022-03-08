@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.6",
+    "jsonwebtoken": "^8.5.1",
+    "react-input-mask": "^2.0.4",
+    "remask": "^0.1.0-alpha.5",
+    "vanilla-masker": "^1.2.0"
+  }
+}
