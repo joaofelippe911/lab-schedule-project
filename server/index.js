@@ -45,7 +45,7 @@ app.get("/api/scheduling/times/getOnViewing", (req, res) => {
   const sqlSelect = "SELECT id, hour FROM times WHERE NOT id IN (SELECT id_time FROM scheduling WHERE date = ? AND NOT id = ?)";
 
   console.log(sqlSelect);
-  console.log(date, scheduleId)
+  console.log("aqui vai pegar")
 
   db.query(sqlSelect, [date, scheduleId], (err, result) => {
     if (err) {

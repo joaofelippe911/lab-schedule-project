@@ -1,0 +1,71 @@
+#scheduling-page {
+    .container {
+        display: grid;
+        height: 100vh;
+        grid-template-columns: 0.8fr repeat(3, 1fr);
+        grid-template-rows: 1fr;
+        grid-template-areas: 'sidebar main main main';
+    }
+
+    main {
+        grid-area: main;
+        width: calc(100vw - 320px);
+        padding: 20px 30px;
+        color: #1B1F23;
+        background: #f0f0f0;
+        overflow-y: auto;
+    }
+
+    .scheduling-form {
+        form {
+            display: flex;
+            flex-direction: column;
+            font-size: 1.1rem;
+            width: calc((100vw - 320px) * .5);
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 0 auto;
+            box-shadow: rgba(209, 209, 209, 0.2) 0px 7px 29px 0px;
+
+            input, select, textarea {
+                border: none;
+                background: transparent;
+                border-bottom: 1px solid #343A40;
+                padding: 5px;
+                border-radius: 2px;
+                margin: 10px 0 20px 0;
+                font-size: 1rem;
+                outline: none;
+            }
+
+            .input-container {
+                display: flex;
+                gap: 30px;
+            }
+
+            .single-input-container {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .button {
+                background-color: #FFF;
+                border: 2px solid #343A40;
+                border-radius: 50px;
+                width: 50%;
+                padding: 15px;
+                cursor: pointer;
+                align-self: center;
+                transition: all 0.15s;
+            }
+
+            .button:hover {
+                background: #343A40;
+                color: #F0F1F3;
+            }
+
+        }
+    }
+}
