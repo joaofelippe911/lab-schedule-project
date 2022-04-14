@@ -1,35 +1,49 @@
 import './styles.scss';
-import whiteBioprevLogo from '../../images/logo_bioprev_branca.png';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-export default function Sidebar({active}) {
+import { Context } from '../../Contexts/AuthContext';
+import { useContext } from 'react';
+
+export default function Sidebar() {
+    const { name, role } = JSON.parse(localStorage.getItem('user'));
+
+    const { handleLogout } = useContext(Context);
+    
     return (
         <div className="sidebar-responsive" id="sidebar">
             <div className="sidebar-top">
-                <h3>Laboratório São João</h3>
+                <h2>Laboratório São João</h2>
+                <p>Olá, {name}</p>
             </div>
-            <div className="sidebar-menu">
-                <h2 className="group-title">Coletas</h2>
-                <Link to="/admin/novo-agendamento">
-                    <div className={active == "scheduling" ? "active sidebar-link" : "sidebar-link"}>
-                        Novo agendamento
-                    </div>
-                </Link>
-                <Link to="/admin/agendamentos">
-                    <div className={active == "schedules" ? "active sidebar-link" : "sidebar-link"}>
-                        Agendamentos
-                    </div>
-                </Link>
-                
-                    
-                
-                <div className="sidebar-link">
-                    <a href="#">Histórico</a>
-                </div>
-                <div className="sidebar-link">
-                    <a href="#">Relatórios</a>
-                </div>
-            </div>
+            <nav className="sidebar-menu">
+                <h2 className="group-title">Agendamentos</h2>
+                <ul>
+                    <li>
+                        <NavLink to="/admin/novo-agendamento" activeClassName='active' >Novo agendamento</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/admin/agendamentos" activeClassName='active' >Pendentes</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/admin/historico" activeClassName='active' >Historico</NavLink>
+                    </li>
+                </ul>                   
+                <h2 className="group-title">Administração</h2>
+                <ul>
+                    {role <= 3 ?
+                        <li>
+                            <NavLink to="/admin/horarios" activeClassName='active'>Horários</NavLink>
+                        </li>
+                    : ''}
+                    <li>
+                        <NavLink to="/admin/relatorios" activeClassName='active' >Relatórios</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/admin/usuarios" activeClassName='active'  >Usuários</NavLink>
+                    </li>
+                </ul>
+                <button onClick={handleLogout} className="logout-button"><i className="fa-solid fa-right-from-bracket"></i> Sair</button>
+            </nav>
         </div>
     )
 }

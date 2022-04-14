@@ -1,0 +1,17 @@
+.modal-content {
+    color: #1b1f23;
+
+    .modal-body {
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .modal-title {
+        margin: 15px 0;
+    }
+}
+
+.confirmation-modal.modal-wrapper {
+    background-color: rgb(0, 0, 0, 0.7);
+    z-index: 1000;
+}

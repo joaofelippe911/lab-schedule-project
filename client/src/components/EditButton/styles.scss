@@ -1,0 +1,16 @@
+.edit-button {
+    border: none !important;
+    font-size: 0.8rem;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all .5s;
+    background: #1875bb;
+    color: #fff;
+    cursor: pointer;
+    width: 50%;
+    max-width: 25px;
+
+    &:hover {
+        background: #1669a8;
+    }
+}

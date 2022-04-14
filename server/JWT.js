@@ -1,7 +1,7 @@
 const { sign, verify } = require("jsonwebtoken");
 
 const createTokens = (user) => {
-    const accessToken = sign({username: user['username'], id: user['id'] }, "jwtsecretmudadpsbbk");
+    const accessToken = sign({username: user['username'], id: user['id'] }, "secretsecret");
 
     return accessToken;
 }
@@ -15,7 +15,7 @@ const validateToken = (req, res, next) => {
     }
 
     try {
-        const validToken = verify(accessToken, "jwtsecretmudadpsbbk");
+        const validToken = verify(accessToken, "secretsecret");
 
         if (validToken) {   
             res.authenticated = true;

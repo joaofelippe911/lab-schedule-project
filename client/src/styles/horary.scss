@@ -1,0 +1,26 @@
+#horary-page {
+    .horary-container {
+        margin-top: 20px;
+    }
+    
+    .single-input-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .horary-title {
+        margin-bottom: 20px;
+        padding-left: 5px;
+    }
+    
+    .save-button {
+        background: #1875bb;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        color: #fff;
+        align-self: flex-end;
+        cursor: pointer;
+    }
+}

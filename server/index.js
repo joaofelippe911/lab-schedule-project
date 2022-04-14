@@ -2,173 +2,161 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const mysql = require("mysql");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { createTokens, validateToken } = require("./JWT");
-
-const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "p4$$@w0rd1",
-  database: "bioprev",
-});
+const { verifyPermission } = require("./middlewares/verifyPermission");
+const db = require('./db');
 
 app.use(cors({credentials: true, origin: "http://localhost:3000"}));
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-app.get("/api/scheduling/times/get/:dateOfCollect", (req, res) => {
 
-  const date = req.params.dateOfCollect;
+// POST /api/schedules/ OK
+app.post("/api/schedules", [validateToken, verifyPermission([1, 2, 3, 4])], db.insertScheduling);
 
-  const sqlSelect = "SELECT id, hour FROM times WHERE NOT id IN (SELECT id_time FROM scheduling WHERE date = ?)";
+app.get("/api/schedules/reports/:initialDate/:finalDate", [validateToken, verifyPermission([1, 3])], async (req, res) => {
+  const { initialDate, finalDate } = req.params;
+
+  console.log(initialDate, finalDate);
+
+  const initialDateSplited = initialDate.split("-");
+  const formatedInitialDate = initialDateSplited[2] + "-" + initialDateSplited[1] + "-" + initialDateSplited[0];
+
+  const finalDateSplited = finalDate.split("-");
+  const formatedFinalDate = finalDateSplited[2] + "-" + finalDateSplited[1] + "-" + finalDateSplited[0];
 
 
-  db.query(sqlSelect, date, (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send([]);
-    } else if (result) {
-      res.send(result);
-    } else {
-      return;
+  const generalData = await db.selectDateIntervalData(formatedInitialDate, formatedFinalDate);
+
+  let finalData = {
+    general: {
+      total: 0,
+      finished: 0,
+      amount: 0
+    }    
+  }
+
+  generalData.forEach((group) => {
+    finalData.general.total += group.total;
+    if(group.status == 3) {
+      finalData.general.finished += group.total;
+      finalData.general.amount += group.amount;
     }
   })
+
+  const tecniciansData = await db.selectTecniciansReportData(formatedInitialDate, formatedFinalDate);
+
+  finalData.tecnicians = tecniciansData;
+
+  const greetersData = await db.selectGreetersReportData(formatedInitialDate, formatedFinalDate);
+
+  finalData.greeters = greetersData;
+  return res.status(200).json(finalData);
 })
 
-app.get("/api/scheduling/times/getOnViewing", (req, res) => {
-  const date = req.query.dateOfCollect;
-  const scheduleId = req.query.scheduleId;
+// PUT /api/schedules/:id OK
+app.put("/api/schedules/:id", [validateToken, verifyPermission([1, 2, 3, 4])], db.updateScheduling);
 
-  const sqlSelect = "SELECT id, hour FROM times WHERE NOT id IN (SELECT id_time FROM scheduling WHERE date = ? AND NOT id = ?)";
+// PUT /api/schedules/finish/:id OK
+app.put("/api/schedules/finish/:id", [validateToken, verifyPermission([1, 2, 3])], db.finishScheduling);
 
-  console.log(sqlSelect);
-  console.log("aqui vai pegar")
+// PUT /api/schedules/meet/:id OK
+app.put("/api/schedules/meet/:id", [validateToken, verifyPermission([1, 2, 3])], db.meetScheduling);
 
-  db.query(sqlSelect, [date, scheduleId], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send([]);
-    } else if (result) {
-      res.send(result);
-    } else {
-      return;
-    }
-  })
-})
+// PUT /api/schedules/reopen/:id OK
+app.put("/api/schedules/reopen/:id", [validateToken, verifyPermission([1, 2, 3])], db.reopenScheduling);
 
-app.post("/api/insert", (req, res) => {
+// GET /api/schedules/ OK
+app.get("/api/schedules/", [validateToken, verifyPermission([1, 2, 3, 4])], db.selectSchedulings)
 
-    const { patientName, cpf, birth, phone, address, neighborhood, number, cep, date, time, responsibleName, responsiblePhone, requisitationNumber, price, note } = req.body;
+// GET /api/schedules/history OK
+app.get("/api/schedules/history", [validateToken, verifyPermission([1, 2, 3, 4])], db.selectSchedulingHistory);
 
-    const sqlInsert = "INSERT INTO scheduling (patient_name, cpf, birth, phone, address, neighborhood, number, cep, date, id_time, responsible_name, responsible_phone, requisitation_number, price, note, id_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,2)";
+// GET /api/schedules/month-numbers OK
+app.get("/api/schedules/month-numbers", [validateToken, verifyPermission([1, 2, 3, 4])], db.selectMonthNumbers);
 
-    db.query(sqlInsert, [patientName, cpf, birth, phone, address, neighborhood, number, cep, date, time, responsibleName, responsiblePhone, requisitationNumber, price, note], (err, result) => {
-      console.log(err);
-      res.send(result);
-    })
-});
+// GET /api/schedules/:id OK
+app.get("/api/schedules/:id", [validateToken, verifyPermission([1, 2, 3, 4])], db.selectScheduling);
 
-app.post("/api/update", (req, res) => {
-  const { scheduleId, date, time, requisitationNumber, price, note } = req.body;
+// GET /api/schedules/times/:dateOfCollect OK
+app.get("/api/schedules/times/:dateOfCollect/:scheduleId?", [validateToken, verifyPermission([1, 2, 3, 4])], db.selectAvailableTimes);
 
-  const sqlUpdate = "UPDATE scheduling SET date = ?, id_time = ?, requisitation_number = ?, price = ?, note = ? WHERE scheduling.id = ?";
+// POST /api/users/ OK
+app.post("/api/users/", [validateToken, verifyPermission([1, 3])], db.insertUser);
 
-  db.query(sqlUpdate, [date, time, requisitationNumber, price, note, scheduleId], (err, result) => {
-    console.log(err);
-    res.send(result);
-  })
-})
+// GET /api/users OK
+app.get("/api/users/", [validateToken, verifyPermission([1, 3])], db.selectUsers);
 
-app.post("/admin/register", (req, res) => {
-  const { username, password, role } = req.body;
+// PUT /api/users/:id OK
+app.put("/api/users/:id", [validateToken, verifyPermission([1, 3])], db.updateUser);
 
-  bcrypt.hash(password, 10).then((hash) => {
-    const sqlInsert = "INSERT INTO user (username, password, role) VALUES (?,?,?)";
+// PUT /api/users/inactivate/:id OK
+app.put("/api/users/inactivate/:id", [validateToken, verifyPermission([1, 3])], db.inactivateUser);
 
-    db.query(sqlInsert, [username, hash, role], (err, result) => {
-      if (err) {
-        console.log(err);
-        res.status(400).json({error: err});
-      } else if (result) {
-        res.json("Usuário registrado!");
-      } else {
-        return;
-      }
-    })
-  })
-})
+// PUT /api/users/activate/:id
+app.put("/api/users/activate/:id", [validateToken, verifyPermission([1, 3])], db.activateUser);
+
+// GET /api/users/:id
+app.get("/api/users/:id", [validateToken, verifyPermission([1, 3])], db.selectUser);
+
+// GET /api/roles/
+app.get("/api/roles", [validateToken, verifyPermission([1, 3])], db.selectRoles);
+
+app.get("/api/times", [validateToken, verifyPermission([1, 2, 3])], db.selectTimes);
+
+app.patch("/api/times/inactivate/:id", [validateToken, verifyPermission([1, 2, 3])], db.inactivateHorary);
 
 app.post("/authenticate", async (req, res) => {
   const { username, password } = req.body;
 
-  console.log("passei aqui autenticando")
+  const user = await db.selectUserDataForLogin(username);
 
-  console.log(username, password);
+  if(!user){
+    return res.status(400).json({error: "User doesn't exists!"});
+  } 
+  
+  const dbPassword = user['password'];
 
-  const sqlQuery = "SELECT id, username, password FROM user WHERE username = ? LIMIT 1";
+  bcrypt.compare(password, dbPassword).then((match) => {
+    if(!match) {
+      return res.status(401).json({error: "Wrong username and password combination"});
+    } 
 
-  const user = await db.query(sqlQuery, [username], (err, result) => {
-    if(!result[0]) {
-      res.status(400).json({error: "User doesn't exists!"});
-    } else {
-      const dbPassword = result[0]['password'];
+    const accessToken = createTokens(user);
 
-      bcrypt.compare(password, dbPassword).then((match) => {
-        if(!match) {
-          res.status(401).json({error: "Wrong username and password combination"});
-        } else {
-          const accessToken = createTokens(result[0]);
+    res.cookie("access-token", accessToken, {
+        maxAge: 60*60*12*1000,
+        httpOnly: true
+    });
 
-          res.cookie("access-token", accessToken, {
-              maxAge: 60*60*12*1000,
-              httpOnly: true
-          });
+    res.cookie("user-id", user['id'], {
+      maxAge: 60*60*12*1000,
+      httpOnly: true
+    })
 
-          res.json({
-            auth: true, 
-            user: {
-              id: result[0]['id'],
-              name: result[0]['username']
-            }
-          });
-        }
-      })
-    }
-  });
+    return res.json({
+      auth: true, 
+      user: {
+        id: user['id'],
+        name: user['username'],
+        role: user['role']
+      }
+    });
+  })
 });
 
 app.get("/verifyAuthentication", validateToken, async (req, res) => {
-  console.log("Passei aqui verificando")
   res.status(200).json({isAuthenticated: true});
 })
 
 app.get("/deleteCookie", async (req, res) => {
-  res.status(200).clearCookie('access-token').send('Cookie deleted');
-})
-
-app.get("/admin/", validateToken, async (req, res) => {
-
-  const sqlQuery = "SELECT scheduling.id schedule_id, scheduling.patient_name, scheduling.address, scheduling.neighborhood, scheduling.number, scheduling.cep, scheduling.phone, scheduling.date, scheduling.price, scheduling.requisitation_number, times.hour FROM scheduling INNER JOIN times ON (times.id = scheduling.id_time) ORDER BY date ASC, hour ASC";
-
-  db.query(sqlQuery, (err, result) => {
-    res.json(result);
-  })
-})
-
-app.post("/admin/search-schedule", validateToken, async (req, res) => {
-  const { id } = req.body;
-
-  const sqlQuery = "SELECT scheduling.id schedule_id, scheduling.patient_name, scheduling.cpf, scheduling.birth, scheduling.address, scheduling.neighborhood, scheduling.number, scheduling.cep, scheduling.phone, scheduling.date, scheduling.price, scheduling.requisitation_number, scheduling.responsible_name, scheduling.responsible_phone, scheduling.note, scheduling.id_time time, times.hour FROM scheduling INNER JOIN times ON (times.id = scheduling.id_time) WHERE scheduling.id = ? LIMIT 1";
-
-  db.query(sqlQuery, [id], (err, result) => {
-    res.json(result);
-  })
-  
+  res.status(200).clearCookie('access-token').clearCookie('user-id').send('Cookie deleted');
 })
 
 app.listen(3001, () => {
   console.log("Running on port 3001");
 });
+

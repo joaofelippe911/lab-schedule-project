@@ -1,53 +1,9 @@
 #schedules-page {
-    .container {
-        display: grid;
-        height: 100vh;
-        grid-template-columns: 0.8fr repeat(3, 1fr);
-        grid-template-rows: 1fr;
-        grid-template-areas: 'sidebar main main main';
-    }
-    
-    main {
-        grid-area: main;
-        width: calc(100vw - 320px);
-        padding: 20px 30px;
-        color: #1B1F23;
-        background: #f0f0f0;
-        overflow-y: auto;
-    }
     
     .cards-container {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         column-gap: 20px;
-    }
-    
-    .card {
-        background: #fff;
-        border-radius: 5px;
-        padding: 15px;
-        height: 150px;
-        box-shadow: rgba(209, 209, 209, 0.2) 0px 7px 29px 0px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-        }
-    
-        .card-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-    
-        // .card-icon {
-        //     color: #1875bb;
-        // }
     }
     
     .schedules-container {
@@ -57,39 +13,5 @@
     .schedules-title {
         margin-bottom: 20px;
         padding-left: 5px;
-    }
-    
-    .schedules-table {
-        width: 100%;
-        background-color: #fff;
-        padding: 15px;
-        border-radius: 5px;
-    
-        table {
-            width: 100%;
-        }
-    
-        th, td {
-            padding: 10px 5px;
-            text-align: start;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-    
-    }
-    
-    .text-blue {
-        color: #1875bb;
-    }
-    
-    .text-yellow {
-        color: #e4d613;
-    }
-    
-    .text-green {
-        color: #39bb18;
     }
 }

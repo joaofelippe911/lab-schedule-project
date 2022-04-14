@@ -22,7 +22,7 @@ export function novaHome() {
         </div>
       </section>
       <section className="about-us">
-        <div className="container">
+        <div className="section-container">
           <div className="about-grid">
            <div className="about-text">
              <span>Conheça-nos um pouco mais</span>
@@ -36,7 +36,7 @@ export function novaHome() {
         </div>
       </section>
       <section className="exams">
-        <div className="container">
+        <div className="section-container">
           <div className="exams-container">
             <h2>Exames</h2>
             <p>Confira a lista de todos os exames que oferecemos, com algumas informações e recomendações.</p>
@@ -45,7 +45,7 @@ export function novaHome() {
         </div>
       </section>
       <section className="scheduling">
-        <div className="container">
+        <div className="section-container">
           <div className="scheduling-container">
             <img src={coletaImg} alt="Coleta Residencial"/>
             <div className="scheduling-text">
@@ -59,7 +59,7 @@ export function novaHome() {
         </div>
       </section>
       <section className="locale">
-        <div className="container">
+        <div className="section-container">
           <div className="locale-container">
             <h2>Localização</h2>
             <p>Venha até nós. Estaremos te esperando com um sorriso no rosto.</p>
@@ -68,7 +68,7 @@ export function novaHome() {
         </div>
       </section>
       <section className="contact">
-        <div className="container">
+        <div className="section-container">
           <div className="contact-container">
             <h2>Contato</h2>
             <div className="card-container">

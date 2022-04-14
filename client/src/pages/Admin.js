@@ -1,57 +1,30 @@
-import api from "../api";
-
-// import { useHistory } from "react-router-dom";
-import { useState, useEffect, useContext } from "react";
-
-import { Context } from "../Contexts/AuthContext";
-
 import Sidebar from "../components/Sidebar";
+import { Switch } from "react-router-dom";
+import CustomRoute from "../components/CustomRoute";
+
+import Schedules from './Schedules';
+import SchedulesHistory from './SchedulesHistory';
+import Users from './Users';
+import { Scheduling } from './Scheduling';
+import Reports from "./Reports";
+import { ReportsDataProvider } from "../Contexts/ReportsContext";
+import Horary from "./Horary";
 
 export function Admin() {
-    const { handleLogout } = useContext(Context);
-
-    // const history =  useHistory();
-
-    // Axios.defaults.withCredentials = true;
-
-    const [ user, setUser ] = useState([]);
-    // const [ loading, setLoading ] = useState(true);
-    const [ schedules, setSchedules ] = useState([]);
-
-    useEffect(() => {
-        // const userData = JSON.parse(localStorage.getItem('user'));
-
-        // setUser(userData);
-
-        (async ()=> {
-            const { data } = await api.get("/admin/");
-
-            setSchedules(data);
-        })();
-
-        // setLoading(false);
-    }, []);
-
-    // if (loading) {
-    //     return <p>Carregando...</p>;
-    // }
-
-    // if (!user) {
-    //     window.location.reload();
-    //     history.push("/admin/login");
-    // }
-
     return (
-    <div className="container">
-        <Sidebar />
-        <ul>
-            {schedules.map((schedule)=> (
-                <li key={schedule.schedule_id}>{schedule.patient_name}</li>
-            ))}
-        </ul>
-            
-            <p>{user.name}</p>
-            <button className="button" type="button" onClick={handleLogout}>Sair</button>
-    </div>
-    );
+        <div className="container">
+            <Sidebar/>
+            <Switch>
+                <CustomRoute isPrivate path="/admin/agendamentos" allowedRoles={[1, 2, 3, 4]} exact component={Schedules} />
+                <CustomRoute isPrivate path="/admin/novo-agendamento" allowedRoles={[1, 2, 3, 4]} exact component={Scheduling} />
+                <CustomRoute isPrivate path="/admin/historico" allowedRoles={[1, 2, 3, 4]} exact component={SchedulesHistory} />
+                <CustomRoute isPrivate path="/admin/usuarios" allowedRoles={[1, 3]} exact component={Users} />
+                <CustomRoute isPrivate path="/admin/horarios" allowedRoles={[1, 3, 4]} exact component={Horary} />
+                
+                <ReportsDataProvider>
+                    <CustomRoute isPrivate path="/admin/relatorios" allowedRoles={[1, 3]} exact component={Reports} />
+                </ReportsDataProvider>
+            </Switch>
+        </div>
+    )
 }

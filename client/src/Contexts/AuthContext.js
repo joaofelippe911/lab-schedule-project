@@ -28,25 +28,21 @@ function AuthProvider({ children }) {
          
     }, []);
     
-
-    async function handleLogin(username, password) {
-        
-        const { data: { auth, user } } = await api.post("/authenticate", {username, password});
-
-        if (auth) {
-            setAuthenticated(true);
-            localStorage.setItem('user', JSON.stringify(user));
-            history.push("/admin");
-        }
-
-        // if (!auth) {
-        //     setAuthenticated(false);
-        // } else {
-        //     setAuthenticated(true);
-        //     localStorage.setItem('user', JSON.stringify(user));
-        //     history.push("/admin");
-        // }
+    function handleSetAuthenticated(){
+        setAuthenticated(true);
     }
+
+    // async function handleLogin(username, password) {
+        
+    //     const { data: { auth, user } } = await api.post("/authenticate", {username, password});
+
+    //     if (auth) {
+    //         setAuthenticated(true);
+    //         localStorage.setItem('user', JSON.stringify(user));
+    //         history.push("/admin/agendamentos");
+    //     }
+    // }
+
 
     function handleLogout() {
         setAuthenticated(false);
@@ -55,7 +51,7 @@ function AuthProvider({ children }) {
     }
 
     return (
-        <Context.Provider value={{ loading, authenticated, handleLogin, handleLogout }}>
+        <Context.Provider value={{ loading, authenticated, handleSetAuthenticated, handleLogout }}>
             {children}
         </Context.Provider>
     )

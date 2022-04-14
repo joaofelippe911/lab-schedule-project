@@ -1,37 +1,42 @@
 import { useContext, useState } from 'react';
 import logoImg from '../images/logo.png';
-import Cookies from 'js-cookie';
-
-import { useHistory } from "react-router-dom";
 
 import { Context } from '../Contexts/AuthContext';
+import api from '../api';
 
 import '../styles/login.scss';
+import history from '../history';
 
 export default function Login() {
-    const { authenticated, handleLogin } = useContext(Context);
-
-    // Axios.defaults.withCredentials = true;
-
-    // const history = useHistory();
+    const { authenticated, handleSetAuthenticated } = useContext(Context);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    // async function handleLogin(event) {
-    //     event.preventDefault();
+    if(authenticated){
+        history.push("/admin/");
+    }
 
-    //     const { data: { authenticated, user } } = await Axios.post("http://localhost:3001/authenticate", {username, password}).catch(()=> {
-    //         window.location.reload();
-    //         return "Error!";
-    //     }); 
-        
-    //     localStorage.setItem('user', JSON.stringify(user));
+    async function handleLogin(event) {
+        event.preventDefault();
+        if(username === ""){
+            return setError("Informe o usuário!");
+        }
 
-    //     if (authenticated) {
-    //         history.push("/admin/");
-    //     }      
-    // }
+        if(password === ""){
+            return setError("Informe a senha");
+        }
+        api.post("/authenticate", {username, password}).then(({ data : { auth, user } }) => {
+            if (auth) {
+                handleSetAuthenticated();
+                localStorage.setItem('user', JSON.stringify(user));
+                history.push("/admin/agendamentos");
+            }
+        }).catch(() => {
+            setError("Usuário ou senha incorretos!");
+        });
+    }
 
     return (
         <div id="login-page">
@@ -42,12 +47,13 @@ export default function Login() {
                         <img src={logoImg} alt="Logo Bioprev" />
                     </div>
                     <div className="form-container">
-                        <form /*method="post" onSubmit={handleLogin(username, password)}*/>
+                        <form onSubmit={handleLogin}>
                             <input type="text" name="user" id="user" placeholder="Usuário" onChange={(event) => setUsername(event.target.value)} value={username} />
                             <input type="password" name="password" id="password" placeholder="Senha" onChange={(event) => setPassword(event.target.value)} value={password} />
-                            <button type="button" className="button" onClick={() => handleLogin(username, password)}>Logar</button>
+                            <button type="submit" className="button">Logar</button>
                         </form>
                     </div>
+                    {error !== "" && <div className='error-messages'><p>{error}</p></div>}
                 </div>
             </section>
         </div>
