@@ -1,27 +1,50 @@
-import ScheduleModal from "../components/ScheduleModal";
+import SchedulingModal from "../components/SchedulingModal";
 import ScheduleTable from "../components/ScheduleTable";
-import { useScheduleModalContext } from "../Contexts/ScheduleModalContext";
 import ScheduleCards from "../components/ScheduleCards";
 
-import '../styles/schedules.scss';
+import Modal from "../components/Modal";
+import { useEffect, useState } from "react";
+import api from "../api";
+
+const TWO_MINUTES_IN_MILLISECONDS = 10000;
 
 export default function Schedules() {
-    const { modalState: {id, visible} } = useScheduleModalContext();
+  const [schedule, setSchedule] = useState([]);
+  const [cardData, setCardData] = useState([]);
 
-    return (
-        <main>
-            <div id="schedules-page">
-                <ScheduleModal visible={visible} scheduleId={id} />
-                <div className="cards-container">
-                    <ScheduleCards />
-                </div>
-                <div className="schedules-container">
-                    <div className="schedules-title">
-                        <h2>Lista de agendamentos</h2>
-                    </div>
-                    <ScheduleTable />
-                </div>
-            </div>
-        </main>
-    )
+  async function getUpdatedSchedule() {
+    const { data } = await api.get("/api/scheduling/");
+    setSchedule(data);
+  }
+
+  async function getUpdatedCardData() {
+    const { data } = await api.get("/api/scheduling/month-numbers");
+    setCardData(data);
+  }
+
+  useEffect(() => {
+    getUpdatedSchedule();
+    getUpdatedCardData();
+    const updateInterval = setInterval(() => {
+      getUpdatedSchedule();
+      getUpdatedCardData();
+      console.log("teste");
+    }, TWO_MINUTES_IN_MILLISECONDS);
+
+    return () => {
+      if (updateInterval !== undefined) {
+        clearInterval(updateInterval);
+      }
+    };
+  }, []);
+
+  return (
+    <div id="schedules-page">
+      <Modal>
+        <SchedulingModal getUpdatedSchedule={getUpdatedSchedule} />
+      </Modal>
+      <ScheduleCards data={cardData} />
+      <ScheduleTable schedule={schedule} />
+    </div>
+  );
 }

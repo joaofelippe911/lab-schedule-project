@@ -1,0 +1,16 @@
+@media (max-width: 960px) {
+  .address-column {
+    display: none;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  td.user-status-column,
+  th.user-status-column {
+    display: none;
+  }
+}

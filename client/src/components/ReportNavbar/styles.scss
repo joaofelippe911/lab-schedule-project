@@ -1,44 +1,104 @@
 #reports-page {
-    .report-navigation {
-        background: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        display: grid;
-        grid-template-columns: .7fr 1fr;
-        gap: 2rem;
+  .report-navigation {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 0.7fr 1fr;
+    grid-gap: 5px;
+  }
+
+  #custom-date-search {
+    justify-content: space-around;
+    flex-direction: row;
+    grid-gap: 20px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    grid-gap: 20px;
+  }
+
+  .date-interval-button {
+    border: 2px solid #1875bb !important;
+    background: transparent;
+    width: 100%;
+    min-width: max-content;
+    padding: 10px;
+    border-radius: 10px;
+    color: #1875bb;
+
+    &.selected {
+      background: #1875bb;
+      font-weight: 500;
+      color: #fff;
+    }
+  }
+
+  @media (min-width: 1280px) and (max-width: 1420px) {
+    .buttons {
+      gap: 10px;
+      overflow: hidden;
     }
 
+    #custom-date-search,
+    .input-container {
+      gap: 10px;
+    }
+  }
+
+  @media (max-width: 1280px) {
+    .report-navigation {
+      grid-template-columns: 1fr;
+    }
+
+    .input-container {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 960px) {
     #custom-date-search {
-        justify-content: space-around;
-        flex-direction: row;
-        gap: 20px;
-        align-items: center;
-
-        .input-container {
-            width: 100%;
-        }
-
+      gap: 10px;
+      font-size: 0.9rem;
     }
 
     .buttons {
-        display: flex;
-        align-items: center;
-        grid-gap: 20px;
+      gap: 10px;
     }
 
-    .date-interval-button {
-        border: 2px solid #1875bb !important;
-        background: transparent;
-        width: 100%;
-        min-width: max-content;
-        padding: 15px;
-        border-radius: 10px;
-        color: #1875bb;
+    .buttons .button {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .report-navigation {
+      padding: 5px;
     }
 
-    .date-interval-button.selected {
-        background: #1875bb;
-        font-weight: 500;
-        color: #fff;
+    #custom-date-search {
+      gap: 5px;
+      font-size: 0.8rem;
+      padding: 5px;
+      flex-direction: column;
+      align-items: flex-end;
     }
+
+    .input-container {
+      width: 100%;
+    }
+
+    .buttons {
+      gap: 5px;
+      flex-direction: column;
+    }
+
+    .buttons .button {
+      font-size: 0.8rem;
+    }
+  }
 }

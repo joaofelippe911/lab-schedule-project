@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
-import { CustomInput } from "../CustomInput";
+import { useCallback, useEffect, useState } from "react";
+import CustomInput from "../CustomInput";
 import { unMask as unMasker } from "remask";
+
+import "./styles.scss";
 
 import api from "../../api";
 import { useConfirmationModalContext } from "../../Contexts/ConfirmationModalContext";
+import Button from "../Button";
+
+const masks = {
+  phone: ["(99) 9999-9999", "(99) 9 9999-9999"],
+  price: ["99,99", "999,99", "9.999,99", "99.999,99", "999.999,99"],
+};
 
 export default function SchedulingForm() {
   const [values, setValues] = useState({});
@@ -13,24 +21,44 @@ export default function SchedulingForm() {
 
   useEffect(() => {
     if (values.date?.length === 10) {
-      const dateOfCollect = values.date.split("/").reverse().join("-");
+      const splitedDateOfCollect = values.date.split("/").reverse();
 
-      api.get(`/api/schedules/times/${dateOfCollect}`).then((response) => {
-        setAvailableTimes(response.data);
-      });
+      const date = new Date(
+        splitedDateOfCollect[0],
+        parseInt(splitedDateOfCollect[1]) - 1,
+        splitedDateOfCollect[2]
+      );
+
+      if (date.getDay() === 0) {
+        return openConfirmationModal({
+          title: "Não é possível realizar agendamentos aos domingos!",
+          text: "Por favor, informe um dia entre segunda e sábado.",
+          buttons: false,
+        });
+      }
+
+      const formatedDateOfCollect = splitedDateOfCollect.join("-");
+
+      api
+        .get(`/api/scheduling/times/${formatedDateOfCollect}`)
+        .then((response) => {
+          setAvailableTimes(response.data);
+        });
     } else {
       setAvailableTimes([]);
     }
   }, [values.date]);
 
-  function handleChange(event) {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
+  const handleChange = useCallback((event) => {
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        [event.target.name]: event.target.value,
+      };
     });
-  }
+  }, []);
 
-  function handleScheduleCollect(event) {
+  function handleSchedule(event) {
     event.preventDefault();
 
     if (!values.patientName) {
@@ -166,216 +194,170 @@ export default function SchedulingForm() {
       values.responsiblePhone = unMasker(values.responsiblePhone);
     }
 
-    api.post("/api/schedules", { ...values, userId: user.id }).then(() => {
+    api.post("/api/scheduling", { ...values, userId: user.id }).then(() => {
       setValues({});
       openConfirmationModal({
         title: "Agendamento realizado com sucesso!",
         buttons: false,
         timer: 2000,
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     });
   }
 
   return (
-    <form onSubmit={handleScheduleCollect} autoComplete="off">
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="patientName">Nome do paciente:</label>
-          <CustomInput
-            type="text"
-            name="patientName"
-            placeholder="Digite o nome do paciente"
-            required
-            onChange={handleChange}
-            value={values.patientName}
-          />
-        </div>
-
-        <div className="single-input-container">
-          <label htmlFor="birth">Data de nascimento:</label>
-          <CustomInput
-            value={values.birth}
-            name="birth"
-            onChange={handleChange}
-            mask="99/99/9999"
-            placeholder="Digite a data de nascimento"
-            required
-            minLength="10"
-          />
-        </div>
-      </div>
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="cpf">CPF:</label>
-          <CustomInput
-            value={values.cpf}
-            name="cpf"
-            onChange={handleChange}
-            mask="999.999.999-99"
-            placeholder="Digite o CPF"
-            required
-            minLength="14"
-          />
-        </div>
-        <div className="single-input-container">
-          <label htmlFor="phone">Telefone:</label>
-          <CustomInput
-            value={values.phone}
-            name="phone"
-            onChange={handleChange}
-            mask={["(99) 9999-9999", "(99) 9 9999-9999"]}
-            placeholder="Digite o telefone"
-            minLength="14"
-            required
-          />
-        </div>
-      </div>
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="address">Endereço:</label>
-          <CustomInput
-            type="text"
-            name="address"
-            placeholder="Digite o endereço para coleta"
-            required
-            onChange={handleChange}
-            value={values.address}
-          />
-        </div>
-        <div className="single-input-container">
-          <label htmlFor="neighborhood">Bairro:</label>
-          <CustomInput
-            type="text"
-            name="neighborhood"
-            placeholder="Digite o bairro"
-            required
-            onChange={handleChange}
-            value={values.neighborhood}
-          />
-        </div>
-      </div>
-
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="number">Número:</label>
-          <CustomInput
-            type="text"
-            name="number"
-            placeholder="Digite o número"
-            required
-            onChange={handleChange}
-            value={values.number}
-          />
-        </div>
-
-        <div className="single-input-container">
-          <label htmlFor="cep">CEP (opcional):</label>
-          <CustomInput
-            value={values.cep}
-            name="cep"
-            onChange={handleChange}
-            mask="99999-999"
-            placeholder="Digite o CEP"
-            minLength="9"
-          />
-        </div>
-      </div>
-
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="date">Data da coleta:</label>
-          <CustomInput
-            value={values.date}
-            name="date"
-            onChange={handleChange}
-            mask="99/99/9999"
-            placeholder="Digite a data da coleta"
-            required
-            minLength="10"
-          />
-        </div>
-
-        <div className="single-input-container">
-          <label htmlFor="time">Horário da coleta:</label>
-          <select
-            value={values.time}
-            name="time"
-            required
-            onChange={handleChange}
-            disabled={availableTimes.length === 0 ? true : false}
-          >
-            <option value="">Selecione um horário</option>
-
-            {availableTimes.map((time) => {
-              return (
-                <option key={time.id} value={time.id}>
-                  {time.hour.slice(0, 5)}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-      </div>
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="responsibleName">
-            Nome do responsável (opcional):
-          </label>
-          <CustomInput
-            type="text"
-            name="responsibleName"
-            placeholder="Digite o nome do responsável"
-            onChange={handleChange}
-            value={values.responsibleName}
-          />
-        </div>
-        <div className="single-input-container">
-          <label htmlFor="phone">Telefone do responsável (opcional):</label>
-          <CustomInput
-            value={values.responsiblePhone}
-            name="responsiblePhone"
-            onChange={handleChange}
-            mask={["(99) 9999-9999", "(99) 9 9999-9999"]}
-            placeholder="Digite o telefone do responsável"
-          />
-        </div>
-      </div>
-      <div className="input-container">
-        <div className="single-input-container">
-          <label htmlFor="requisitationNumber">Número da requisição:</label>
-          <CustomInput
-            value={values.requisitationNumber}
-            name="requisitationNumber"
-            onChange={handleChange}
-            mask={["999999"]}
-            placeholder="Digite o número da requisição"
-            required
-          />
-        </div>
-        <div className="single-input-container">
-          <label htmlFor="price">Valor (R$)</label>
-          <CustomInput
-            value={values.price}
-            name="price"
-            onChange={handleChange}
-            mask={["99,99", "999,99", "9.999,99", "99.999,99", "999.999,99"]}
-            placeholder="Digite o valor"
-            required
-          />
-        </div>
-      </div>
-      <label htmlFor="note">Observações (opcional):</label>
-      <textarea
-        name="note"
-        placeholder="Digite aqui a sua mensagem"
+    <form onSubmit={handleSchedule} id="scheduling-form" autoComplete="off">
+      <CustomInput
+        type="text"
+        name="patientName"
+        label="Nome do paciente"
+        placeholder="Digite o nome do paciente"
+        required
         onChange={handleChange}
-        value={values.note}
-      ></textarea>
+        value={values.patientName || ""}
+      />
+      <CustomInput
+        value={values.birth || ""}
+        name="birth"
+        label="Data de nascimento"
+        onChange={handleChange}
+        mask="99/99/9999"
+        placeholder="Digite a data de nascimento"
+        required
+        minLength="10"
+      />
+      <CustomInput
+        value={values.cpf || ""}
+        name="cpf"
+        label="CPF"
+        onChange={handleChange}
+        mask="999.999.999-99"
+        placeholder="Digite o CPF"
+        required
+        minLength="14"
+      />
+      <CustomInput
+        value={values.phone || ""}
+        name="phone"
+        label="Telefone"
+        onChange={handleChange}
+        mask={masks.phone}
+        placeholder="Digite o telefone"
+        minLength="14"
+        required
+      />
+      <CustomInput
+        type="text"
+        name="address"
+        label="Endereço"
+        placeholder="Digite o endereço para coleta"
+        required
+        onChange={handleChange}
+        value={values.address || ""}
+      />
+      <CustomInput
+        type="text"
+        label="Bairro"
+        name="neighborhood"
+        placeholder="Digite o bairro"
+        required
+        onChange={handleChange}
+        value={values.neighborhood || ""}
+      />
+
+      <CustomInput
+        type="text"
+        name="number"
+        label="Número"
+        placeholder="Digite o número"
+        required
+        onChange={handleChange}
+        value={values.number || ""}
+      />
+      <CustomInput
+        value={values.cep || ""}
+        name="cep"
+        label="CEP (opcional)"
+        onChange={handleChange}
+        mask="99999-999"
+        placeholder="Digite o CEP"
+        minLength="9"
+      />
+      <CustomInput
+        value={values.date || ""}
+        name="date"
+        label="Data da coleta"
+        onChange={handleChange}
+        mask="99/99/9999"
+        placeholder="Digite a data da coleta"
+        required
+        minLength="10"
+      />
+      <div className="input-container">
+        <label htmlFor="time">Horário da coleta:</label>
+        <select
+          value={values.time || ""}
+          name="time"
+          required
+          onChange={handleChange}
+          disabled={availableTimes.length === 0 ? true : false}
+        >
+          <option value="">Selecione um horário</option>
+
+          {availableTimes.map((time) => {
+            return (
+              <option key={time.id} value={time.id}>
+                {time.hour.slice(0, 5)}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      <CustomInput
+        type="text"
+        name="responsibleName"
+        label="Nome do responsável (opcional)"
+        placeholder="Digite o nome do responsável"
+        onChange={handleChange}
+        value={values.responsibleName || ""}
+      />
+      <CustomInput
+        value={values.responsiblePhone || ""}
+        name="responsiblePhone"
+        label="Telefone do responsável (opcional)"
+        onChange={handleChange}
+        mask={masks.phone}
+        placeholder="Digite o telefone do responsável"
+      />
+      <CustomInput
+        value={values.requisitationNumber || ""}
+        name="requisitationNumber"
+        label="Número da requisição"
+        onChange={handleChange}
+        mask="999999"
+        placeholder="Digite o número da requisição"
+        required
+      />
+      <CustomInput
+        value={values.price || ""}
+        name="price"
+        label="Valor (R$)"
+        onChange={handleChange}
+        mask={masks.price}
+        placeholder="Digite o valor"
+        required
+      />
+      <div className="input-container">
+        <label htmlFor="note">Observações (opcional):</label>
+        <textarea
+          name="note"
+          placeholder="Digite aqui a sua mensagem"
+          onChange={handleChange}
+          value={values.note || ""}
+          rows="5"
+        ></textarea>
+      </div>
       <div className="buttons-container">
-        <input type="submit" value="Enviar" className="button" />
+        <Button type="submit">Enviar</Button>
       </div>
     </form>
   );

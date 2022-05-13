@@ -1,9 +1,9 @@
+const UserController = require("../controllers/UserController");
+
 const verifyPermission = (permissions) => {
     return async (req, res, next) => {
         const userId = parseInt(req.cookies['user-id']);
-        const db = require("../db");
-
-        const userRole = await db.selectUserRole(userId);
+        const userRole = await UserController.selectUserRole(userId);
 
         if(permissions.includes(userRole)) {
             return next();

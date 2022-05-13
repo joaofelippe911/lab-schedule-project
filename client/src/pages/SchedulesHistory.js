@@ -1,33 +1,41 @@
-import { useState } from "react";
-import ScheduleModal from "../components/ScheduleModal";
+import Modal from "../components/Modal";
+import SchedulingModal from "../components/SchedulingModal";
 import ScheduleTable from "../components/ScheduleTable";
-import { useScheduleModalContext } from "../Contexts/ScheduleModalContext";
 
-import '../styles/schedulesHistory.scss';
+import "../styles/schedulesHistory.scss";
+import api from "../api";
+import { useEffect, useState } from "react";
 
+export default function SchedulesHistory() {
+  const [schedule, setSchedule] = useState([]);
+  const [unlimited, setUnlimited] = useState(false);
 
-export default function SchedulesHistory(){
+  async function getUpdatedSchedule() {
+    const { data } = await api.get("/api/scheduling/history", {
+      params: { isUnlimited: unlimited },
+    });
+    setSchedule(data);
+  }
 
-    const [unlimited, setUnlimited] = useState(false);
+  function handleToggleUnlimited() {
+    setUnlimited(!unlimited);
+  }
 
-    const { modalState: {id, visible } } = useScheduleModalContext();
+  useEffect(() => {
+    getUpdatedSchedule();
+  }, [unlimited]);
 
-    function handleUnlimitTable(){
-        setUnlimited(true);
-    }
-
-    function handleLimitTable(){
-        setUnlimited(false);
-    }
-
-    return (
-        <main>
-            <div id="schedules-history-page">
-                <ScheduleModal visible={visible} scheduleId={id} />
-                {!unlimited ? <button onClick={handleUnlimitTable} className="button limit-button">Mostrar tudo</button> : <button onClick={handleLimitTable} className="button limit-button">Mostrar menos</button>}
-                <ScheduleTable isHistory isUnlimited={unlimited}/>
-            </div>
-        </main>
-    )
+  return (
+    <div id="schedules-history-page">
+      <Modal>
+        <SchedulingModal getUpdatedSchedule={getUpdatedSchedule} />
+      </Modal>
+      <ScheduleTable
+        schedule={schedule}
+        isHistory
+        toggleUnlimited={handleToggleUnlimited}
+        unlimited={unlimited}
+      />
+    </div>
+  );
 }
-

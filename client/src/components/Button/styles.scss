@@ -1,0 +1,52 @@
+.button {
+  border: none;
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  transition: all 0.5s;
+  background: #1875bb;
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background: #1669a8;
+  }
+
+  @media (max-width: 960px) {
+    font-size: 0.9rem;
+  }
+}
+
+// Button variations
+
+.button.red {
+  background: #ca0404 !important;
+
+  &:hover {
+    background: #bb0606 !important;
+  }
+}
+
+.button.orange {
+  background: #ca6404 !important;
+
+  &:hover {
+    background: #b45904 !important;
+  }
+}
+
+.button.green {
+  background: #39bb18 !important;
+
+  &:hover {
+    background: #21a115 !important;
+  }
+}
+
+.time-button {
+  min-width: 67px;
+}
+
+.limit-button {
+  margin: 15px;
+}

@@ -1,60 +1,100 @@
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #sidebar {
-    width: 320px;
-    grid-area: sidebar;
-    background: #1B1F23;
-    height: 100vh;
-    color: #f0f0f0;
+  width: 320px;
+  grid-area: sidebar;
+  background: #1b1f23;
+  height: 100vh;
+  color: #f0f0f0;
 
-    ul li {
-        // padding: 10px 0 10px 10px;
-        width: 100%;
-        cursor: pointer;
-        list-style: none;
-        display: flex;
-    }
+  &.closed {
+    width: 50px;
+  }
 
-    .active {
-        margin-left: 5px;
-        background: #36383a;
-        border-radius: 10px;
-    }
-}
+  ul li {
+    width: 100%;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+  }
 
-.sidebar-top {
+  .active {
+    margin-left: 5px;
+    background: #36383a;
+    border-radius: 10px;
+  }
+
+  .sidebar-top {
     display: flex;
     padding: 20px;
     flex-direction: column;
     gap: 15px;
     justify-content: center;
     border-bottom: 1px solid #e2e2e238;
-}
+  }
 
-.sidebar-menu {
+  .sidebar-menu {
     padding: 20px;
 
     a {
-        text-decoration: none;
-        color: #eeeeee;
-        width: 100%;
-        padding: 10px;
+      text-decoration: none;
+      color: #eeeeee;
+      width: 100%;
+      padding: 10px;
     }
-}
+  }
 
-.group-title {
+  .group-title {
     margin: 15px 0;
-}
+  }
 
-.logout-button {
+  .logout-button {
     border: none;
-    background: #1B1F23;
-    color: #eeeeee;
+    background: #1b1f23;
     padding: 5px;
     font-size: 1rem;
     border-radius: 5px;
     cursor: pointer;
+  }
+
+  .sidebar-actions-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: transparent;
+    color: #f0f0f0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .siderbar-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 1280px) {
+    width: 250px;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    position: fixed;
+    z-index: 999;
+
+    &.closed {
+      height: 50px;
+      width: 100%;
+    }
+  }
 }

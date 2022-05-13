@@ -1,57 +1,92 @@
+function getFirstAndLastDayOfTheWeek() {
+  const date = new Date();
 
-function getFirstDayOfTheWeek(date){
+  let currentDateSplited = date
+    .toLocaleDateString("pt-br", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .split("/");
 
-  let currentDateSplited = date.toLocaleDateString('pt-br', {
-    year: "numeric",
-    month: '2-digit',
-    day: '2-digit',
-  }).split("/");
+  let currentMonthNumOfDays = new Date(
+    currentDateSplited[2],
+    currentDateSplited[1],
+    0
+  ).getDate();
 
-  let dayOfMonth = date.getDate();
+  let dayOfMonth = parseInt(currentDateSplited[0]);
+  let firstDayOfTheWeek;
+  let lastDayOfTheWeek;
 
-  let currentDayOfWeek = date.getDay();
-  if(dayOfMonth >= 7) {
-    const firstDayOfTheWeek = dayOfMonth - currentDayOfWeek;
-    return (currentDateSplited[2] + '-' + currentDateSplited[1] + '-' + (('0' + (firstDayOfTheWeek)).slice(-2)));
+  let currentDayOfWeek = new Date().getDay();
+
+  if (dayOfMonth - currentDayOfWeek > 0) {
+    firstDayOfTheWeek = dayOfMonth - currentDayOfWeek;
+    firstDayOfTheWeek =
+      currentDateSplited[2] +
+      "-" +
+      currentDateSplited[1] +
+      "-" +
+      ("0" + firstDayOfTheWeek).slice(-2);
   } else {
-    const d = (currentDateSplited[1] - 1) <= 0 ? new Date((currentDateSplited[2] - 1), "12", 0) : new Date(currentDateSplited[2], (currentDateSplited[1] - 1), 0);
-    
-    const previousMonthNumOfDays = d.getDate();
-    if((dayOfMonth - currentDayOfWeek) < 0){
-      const firstDayOfTheWeek = previousMonthNumOfDays + (dayOfMonth - currentDayOfWeek);
-      return (d.getFullYear() + "-" + (("0" + (d.getMonth() + 1)).slice(-2)) + "-" + firstDayOfTheWeek); 
+    let d = new Date(currentDateSplited[2], currentDateSplited[1] - 1, 0);
+    let previousMonthNumOfDays = d.getDate();
+    firstDayOfTheWeek =
+      previousMonthNumOfDays + (dayOfMonth - currentDayOfWeek);
+
+    if (currentDateSplited[1] != 1) {
+      firstDayOfTheWeek =
+        currentDateSplited[2] +
+        "-" +
+        ("0" + (currentDateSplited[1] - 1)).slice(-2) +
+        "-" +
+        ("0" + firstDayOfTheWeek).slice(-2);
     } else {
-      const firstDayOfTheWeek = dayOfMonth - currentDayOfWeek;
-      return (currentDateSplited[2] + "-" + currentDateSplited[1] + "-" + (("0" + firstDayOfTheWeek).slice(-2)));
+      firstDayOfTheWeek =
+        currentDateSplited[2] -
+        1 +
+        "-12-" +
+        ("0" + firstDayOfTheWeek).slice(-2);
     }
   }
 
-}
-
-function getLastDayOfTheWeek(date){
-  let currentDateSplited = date.toLocaleDateString('pt-br', {
-    year: "numeric",
-    month: '2-digit',
-    day: '2-digit',
-  }).split("/");
-
-  let currentMonthNumOfDays = new Date(currentDateSplited[2], currentDateSplited[1], 0).getDate();
-  let dayOfMonth = date.getDate();
-  let currentDayOfWeek = date.getDay();
-
-  if(dayOfMonth <= (currentMonthNumOfDays - 6)){
-    const lastDayOfTheWeek = dayOfMonth.valueOf() + (6 - currentDayOfWeek);
-    return (currentDateSplited[2] + '-' + currentDateSplited[1] + '-' + ('0' + (lastDayOfTheWeek)).slice(-2));
+  if (dayOfMonth <= currentMonthNumOfDays - 7) {
+    lastDayOfTheWeek = dayOfMonth.valueOf() + (6 - currentDayOfWeek);
+    lastDayOfTheWeek =
+      currentDateSplited[2] +
+      "-" +
+      currentDateSplited[1] +
+      "-" +
+      ("0" + lastDayOfTheWeek).slice(-2);
   } else {
-    const lastDayOfTheWeek = (6 - currentDayOfWeek) - (currentMonthNumOfDays - dayOfMonth);
-    if(lastDayOfTheWeek == 0){
-      return (currentDateSplited[2] + '-' + currentDateSplited[1] + '-' + ('0' + (currentMonthNumOfDays)).slice(-2));
-    } else if((date.getMonth() + 1) == 12){
-      return ((parseInt(currentDateSplited[2]) + 1) + '-01-' + ('0' + (lastDayOfTheWeek)).slice(-2));
+    lastDayOfTheWeek =
+      6 - currentDayOfWeek - (currentMonthNumOfDays - dayOfMonth);
+    if (lastDayOfTheWeek === 0) {
+      lastDayOfTheWeek = currentMonthNumOfDays;
+      lastDayOfTheWeek =
+        currentDateSplited[2] +
+        "-" +
+        ("0" + (date.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + lastDayOfTheWeek).slice(-2);
+    } else if (date.getMonth() === 11) {
+      lastDayOfTheWeek =
+        parseInt(currentDateSplited[2]) +
+        1 +
+        "-01-" +
+        ("0" + lastDayOfTheWeek).slice(-2);
     } else {
-      return (currentDateSplited[2] + '-' + currentDateSplited[1] + '-' + ('0' + (lastDayOfTheWeek)).slice(-2));
+      lastDayOfTheWeek =
+        currentDateSplited[2] +
+        "-" +
+        ("0" + (date.getMonth() + 2)).slice(-2) +
+        "-" +
+        ("0" + lastDayOfTheWeek).slice(-2);
     }
   }
+
+  return { firstDayOfTheWeek, lastDayOfTheWeek };
 }
 
-module.exports = { getFirstDayOfTheWeek, getLastDayOfTheWeek }
+module.exports = { getFirstAndLastDayOfTheWeek };

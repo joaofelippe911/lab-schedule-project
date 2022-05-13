@@ -1,33 +1,27 @@
-import React from 'react';
-import { Router } from 'react-router-dom';
+import React from "react";
+import { Router } from "react-router-dom";
 
-import Routes from './routes';
-import history from './history';
+import Routes from "./routes";
+import history from "./history";
 
 import "./styles/global.scss";
 
-import ConfirmationModal from "./components/ConfirmationModal";
-
-import { AuthProvider } from './Contexts/AuthContext';
-import { ScheduleModalProvider } from './Contexts/ScheduleModalContext';
-import { UserModalProvider } from './Contexts/UserModalContext';
-import { ConfirmationModalProvider } from './Contexts/ConfirmationModalContext';
+import { AuthProvider } from "./Contexts/AuthContext";
+import { ModalProvider } from "./Contexts/ModalContext";
+import { ConfirmationModalProvider } from "./Contexts/ConfirmationModalContext";
 
 function App() {
   return (
-    <AuthProvider>
-      <ScheduleModalProvider>
-        <UserModalProvider>
+    <Router history={history}>
+      <AuthProvider>
+        <ModalProvider>
           <ConfirmationModalProvider>
-            <ConfirmationModal />
-            <Router history={history}>
-                <Routes />
-            </Router>
+            <Routes />
           </ConfirmationModalProvider>
-        </UserModalProvider>
-      </ScheduleModalProvider>
-    </AuthProvider>
-  )
+        </ModalProvider>
+      </AuthProvider>
+    </Router>
+  );
 }
 
 export default App;

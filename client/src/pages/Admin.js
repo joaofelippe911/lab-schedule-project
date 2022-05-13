@@ -1,30 +1,40 @@
-import Sidebar from "../components/Sidebar";
-import { Switch } from "react-router-dom";
-import CustomRoute from "../components/CustomRoute";
+import { Redirect, Route, Switch } from "react-router-dom";
 
-import Schedules from './Schedules';
-import SchedulesHistory from './SchedulesHistory';
-import Users from './Users';
-import { Scheduling } from './Scheduling';
+import { Scheduling } from "./Scheduling";
+import SchedulesHistory from "./SchedulesHistory";
+import Schedules from "./Schedules";
+import Users from "./Users";
+import Time from "./Time";
 import Reports from "./Reports";
-import { ReportsDataProvider } from "../Contexts/ReportsContext";
-import Horary from "./Horary";
+
+import ConfirmationModal from "../components/ConfirmationModal";
+import Sidebar from "../components/Sidebar";
+import CustomRoute from "../components/CustomRoute";
+import { useState } from "react";
 
 export function Admin() {
-    return (
-        <div className="container">
-            <Sidebar/>
-            <Switch>
-                <CustomRoute isPrivate path="/admin/agendamentos" allowedRoles={[1, 2, 3, 4]} exact component={Schedules} />
-                <CustomRoute isPrivate path="/admin/novo-agendamento" allowedRoles={[1, 2, 3, 4]} exact component={Scheduling} />
-                <CustomRoute isPrivate path="/admin/historico" allowedRoles={[1, 2, 3, 4]} exact component={SchedulesHistory} />
-                <CustomRoute isPrivate path="/admin/usuarios" allowedRoles={[1, 3]} exact component={Users} />
-                <CustomRoute isPrivate path="/admin/horarios" allowedRoles={[1, 3, 4]} exact component={Horary} />
-                
-                <ReportsDataProvider>
-                    <CustomRoute isPrivate path="/admin/relatorios" allowedRoles={[1, 3]} exact component={Reports} />
-                </ReportsDataProvider>
-            </Switch>
-        </div>
-    )
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const onCollapse = (sidebarOpen) => {
+    setSidebarOpen(sidebarOpen);
+  };
+
+  return (
+    <div className="container">
+      <ConfirmationModal />
+      <Sidebar onCollapse={onCollapse} />
+      <main className={!sidebarOpen ? "full-w" : ""}>
+        <Switch>
+          <CustomRoute isPrivate path="/" allowedRoles={[1, 2, 3, 4]} exact component={() => <Redirect to="/agendamentos" />} />
+          <CustomRoute isPrivate path="/agendamentos" allowedRoles={[1, 2, 3, 4]} exact component={Schedules} />
+          <CustomRoute isPrivate path="/novo-agendamento" allowedRoles={[1, 2, 3, 4]} exact component={Scheduling} />
+          <CustomRoute isPrivate path="/historico" allowedRoles={[1, 2, 3, 4]} exact component={SchedulesHistory} />
+          <CustomRoute isPrivate path="/usuarios" allowedRoles={[1, 3]} exact component={Users} />
+          <CustomRoute isPrivate path="/horarios" allowedRoles={[1, 2, 3]} exact component={Time} />
+          <CustomRoute isPrivate path="/relatorios" allowedRoles={[1, 3]} exact component={Reports} />
+          <Route path="/*" component={() => <h1>Error 404 - Page not found</h1>} />
+        </Switch>
+      </main>
+    </div>
+  );
 }
