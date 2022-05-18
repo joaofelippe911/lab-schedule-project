@@ -6,7 +6,7 @@ import Modal from "../components/Modal";
 import { useEffect, useState } from "react";
 import api from "../api";
 
-const TWO_MINUTES_IN_MILLISECONDS = 10000;
+const TWO_MINUTES_IN_MILLISECONDS = 120000;
 
 export default function Schedules() {
   const [schedule, setSchedule] = useState([]);
