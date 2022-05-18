@@ -17,8 +17,6 @@ router.post("/api/scheduling", [validateToken, verifyPermission([1, 2, 3, 4])], 
 router.get("/api/scheduling/reports/:initialDate/:finalDate", [validateToken, verifyPermission([1, 3])], async (req, res) => {
   const { initialDate, finalDate } = req.params;
 
-  console.log(initialDate, finalDate);
-
   const formatedInitialDate = initialDate.split("-").reverse().join("-");
 
   const formatedFinalDate = finalDate.split("-").reverse().join("-");
@@ -49,7 +47,6 @@ router.get("/api/scheduling/reports/:initialDate/:finalDate", [validateToken, ve
 
   finalData.greeters = greetersData;
 
-  console.log(initialDate, finalDate);
   return res.status(200).json(finalData);
 })
 

@@ -28,7 +28,6 @@ export default function Schedules() {
     const updateInterval = setInterval(() => {
       getUpdatedSchedule();
       getUpdatedCardData();
-      console.log("teste");
     }, TWO_MINUTES_IN_MILLISECONDS);
 
     return () => {

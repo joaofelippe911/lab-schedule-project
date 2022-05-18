@@ -31,7 +31,7 @@ const selectTimes = async function(req, res){
   
   const selectAvailableTimes = async function(req, res){
     const date = req.params.dateOfCollect;
-    const scheduleId = req.params.scheduleId;
+    const scheduleId = req.params.schedulingId;
     let sql = "SELECT id, hour FROM time WHERE NOT id IN (SELECT id_time FROM scheduling WHERE date = ?";
     if(scheduleId !== undefined){
       sql += " AND NOT id = ?";
